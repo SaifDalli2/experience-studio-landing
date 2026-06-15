@@ -1,12 +1,12 @@
-# Experience Studio — landing site
+# Qarar — experience studio
 
-A bilingual (English / Arabic, RTL-aware) editorial landing site for an end-to-end
-**experience-design studio** — a practice that takes a client from a customer need →
-proposed solution → service catalog → system & API design → automated support &
-workflow. Positioning: *"We don't hand off. We ship."*
+A bilingual (English / Arabic, RTL-aware) editorial landing site for **Qarar** (Arabic
+**قرار**, "decision") — an end-to-end **experience-design studio** that takes a client
+from a customer need → proposed solution → service catalog → system & API design →
+automated support & workflow. Positioning: *"We don't hand off. We ship."*
 
-> **Brand name is a placeholder.** It lives in a single source of truth —
-> `window.BRAND` in `studio.js` — change it there and it updates everywhere.
+> The brand name lives in a single source of truth — `window.BRAND` in `studio.js`
+> (language-aware: "Qarar" in English, "قرار" in Arabic).
 
 Static site, no build step. Open `index.html` (English) or `index.ar.html` (Arabic)
 in a browser.

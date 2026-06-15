@@ -7,7 +7,7 @@
    ============================================================ */
 (function(){
   /* ===== SINGLE SOURCE OF TRUTH FOR THE BRAND NAME (placeholder) ===== */
-  window.BRAND = "Studio";   // ← change this when the real name is chosen
+  window.BRAND = (document.documentElement.lang||'').toLowerCase().startsWith('ar') ? "قرار" : "Qarar";
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isAr = (document.documentElement.lang||'').toLowerCase().startsWith('ar');

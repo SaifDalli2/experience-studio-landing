@@ -210,8 +210,11 @@ body[data-texture="lattice"] .texture-layer{opacity:1;background-image:repeating
 /* ============ HERO MEDIA — Najdi backdrop, text in front ============ */
 .hero-media{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100vw;z-index:0;pointer-events:none;overflow:hidden}
 .hero-media img{width:100%;height:100%;object-fit:cover;object-position:left center;display:block}
-/* scrim from the bottom so the headline + subline stay legible */
-.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, var(--bg) 4%, color-mix(in srgb,var(--bg) 60%,transparent) 30%, transparent 60%)}
+/* scrims: a top one so the nav keeps theme contrast over the photo, and a bottom
+   one so the headline + subline stay legible */
+.hero-media::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(to bottom, color-mix(in srgb,var(--bg) 82%,transparent) 0%, color-mix(in srgb,var(--bg) 32%,transparent) 9%, transparent 18%),
+  linear-gradient(to top, var(--bg) 4%, color-mix(in srgb,var(--bg) 60%,transparent) 30%, transparent 60%)}
 .hero > *:not(.hero-media){position:relative;z-index:1}
 
 @media (prefers-reduced-motion:reduce){
