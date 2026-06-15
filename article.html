@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- Article page — content from journal.js, opened via ?id=... -->
+<title>Journal — Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="studio.css">
+<style>
+.nav .back{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:.9rem;font-weight:500}
+.nav .back .ar{transition:transform .35s ease}
+.nav .back:hover .ar{transform:translateX(-4px)}
+.acta{background:var(--ink);color:var(--bg);padding-block:clamp(70px,12vh,140px);margin-top:clamp(40px,7vh,80px)}
+.acta h2{font-family:var(--serif);font-weight:300;letter-spacing:-.03em;line-height:1.05;font-size:clamp(1.8rem,5vw,3.4rem);max-width:18ch;margin-bottom:28px}
+.acta a{display:inline-flex;align-items:center;gap:12px;font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,2.6vw,1.8rem);border-bottom:1px solid color-mix(in srgb,var(--bg) 40%,transparent);padding-bottom:7px;transition:gap .4s,border-color .4s}
+.acta a:hover{gap:24px;border-color:var(--bg)}
+</style>
+</head>
+<body data-theme="sand" data-texture="none" data-type="inter">
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="brand" href="index.html" data-cursor>
+      <span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1" stroke="currentColor" stroke-width="1.4"/></svg></span>
+      <span data-brand>Studio</span><span class="tbd">name tbd</span>
+    </a>
+    <a class="back" href="index.html#journal" data-cursor><span class="ar">←</span> Journal</a>
+  </div>
+  <a class="lang" id="langToggle" href="index.ar.html" data-cursor>ع</a>
+</nav>
+
+<main class="article wrap" id="article"></main>
+
+<script src="journal.js"></script>
+<script>
+(function(){
+  const posts = window.JOURNAL||[];
+  const id = new URLSearchParams(location.search).get('id');
+  let idx = posts.findIndex(p=>p.id===id);
+  if(idx<0) idx=0;
+  const p = posts[idx];
+  const prev = posts[(idx-1+posts.length)%posts.length];
+  const next = posts[(idx+1)%posts.length];
+  document.title = (p?p.title:'Journal') + ' — ' + (window.BRAND||'Studio');
+  const lt = document.getElementById('langToggle'); if(lt) lt.href = p ? `article.ar.html?id=${encodeURIComponent(p.id)}` : 'index.ar.html';
+
+  const block = b => b.t==='h2' ? `<h2>${b.x}</h2>`
+    : b.t==='quote' ? `<blockquote>${b.x}</blockquote>`
+    : b.t==='ul' ? `<ul>${(b.items||[]).map(i=>`<li>${i}</li>`).join('')}</ul>`
+    : b.t==='btn' ? `<a class="prose-btn" href="${b.href}" target="_blank" rel="noopener">${b.x}</a>`
+    : `<p>${b.x}</p>`;
+
+  document.getElementById('article').innerHTML = p ? `
+    <header class="art-head reveal">
+      <div class="art-meta"><span>${p.tag}</span><span class="dot">·</span><span>${p.date}</span><span class="dot">·</span><span>${p.read}</span></div>
+      <h1>${p.title}</h1>
+      <p class="art-dek">${p.dek}</p>
+    </header>
+    ${p.img ? `<figure class="art-hero reveal"><img src="${p.img}" alt=""/></figure>` : ''}
+    <div class="prose reveal" data-d="1">${p.body.map(block).join('')}</div>
+    <nav class="anav">
+      <a class="prev" href="article.html?id=${encodeURIComponent(prev.id)}" data-cursor><span class="dir">← Previous</span><span class="t">${prev.title}</span></a>
+      <a class="next" href="article.html?id=${encodeURIComponent(next.id)}" data-cursor><span class="dir">Next →</span><span class="t">${next.title}</span></a>
+    </nav>
+  ` : `<div class="art-head"><h1>Article not found.</h1><p class="art-dek"><a href="index.html#journal" style="border-bottom:1px solid var(--accent)">Back to the journal →</a></p></div>`;
+})();
+</script>
+<section class="acta">
+  <div class="wrap"><h2>Bring us a need. We'll ship the service.</h2><a href="mailto:hello@studio.example" data-cursor>hello@studio.example&nbsp; →</a></div>
+</section>
+<script src="studio.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- Capability detail page — content from capabilities.js, opened via ?id=... -->
+<title>Capability — Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="studio.css">
+<style>
+/* ===== PAGE-SPECIFIC (capability detail) ===== */
+.nav .back{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:.9rem;font-weight:500}
+.nav .back .ar{transition:transform .35s ease}
+.nav .back:hover .ar{transform:translateX(-4px)}
+
+.dhero{padding-top:clamp(120px,17vh,200px);padding-bottom:clamp(36px,6vh,72px)}
+.dhero .kicker{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.dhero .kicker .no{font-family:var(--serif);font-size:1rem;color:var(--muted)}
+.dhero .kicker .tag{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 11px}
+.dhero h1{font-family:var(--serif);font-weight:300;letter-spacing:-0.03em;line-height:1.0;font-size:clamp(2.6rem,8vw,6.2rem);max-width:16ch}
+.dhero .lead{margin-top:30px;font-family:var(--serif);font-weight:300;font-style:italic;font-size:clamp(1.3rem,2.8vw,2rem);line-height:1.25;color:var(--ink-soft);max-width:30ch}
+
+.drow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.5fr);gap:clamp(22px,6vw,90px);padding-block:clamp(40px,7vh,78px);border-top:1px solid var(--line);align-items:start}
+.drow .lbl{position:sticky;top:96px;display:flex;flex-direction:column;gap:12px}
+.drow h2{font-family:var(--serif);font-weight:300;font-size:clamp(1.5rem,3vw,2.3rem);letter-spacing:-0.02em;line-height:1.1}
+.basis-txt{font-size:1.08rem;color:var(--ink-soft);max-width:60ch;margin-bottom:22px}
+
+.alist{list-style:none}
+.alist li{display:grid;grid-template-columns:42px 1fr;gap:18px;padding:20px 0;border-top:1px solid var(--line-soft);align-items:baseline}
+.alist li:first-child{border-top:none;padding-top:0}
+.alist .an{font-family:var(--serif);color:var(--muted);font-size:1rem}
+.alist .at{font-size:1.12rem;color:var(--ink);letter-spacing:-.01em}
+
+.dlist{list-style:none;display:flex;flex-direction:column;gap:0}
+.dlist li{padding:15px 0 15px 26px;position:relative;color:var(--ink);border-top:1px solid var(--line-soft);font-size:1.05rem}
+.dlist li:first-child{border-top:none}
+.dlist li::before{content:"";position:absolute;left:0;top:24px;width:11px;height:1px;background:var(--accent)}
+
+.reflist{list-style:none}
+.reflist li{font-size:.95rem;color:var(--ink-soft);padding:13px 0;border-top:1px solid var(--line-soft);display:grid;grid-template-columns:24px 1fr;gap:10px}
+.reflist li:first-child{border-top:none}
+.reflist .rn{font-family:var(--serif);color:var(--muted);font-size:.85rem}
+
+.dnav{display:flex;justify-content:space-between;gap:20px;padding-block:clamp(40px,7vh,70px);border-top:1px solid var(--line)}
+.dnav a{display:flex;flex-direction:column;gap:6px;max-width:46%}
+.dnav .dir{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.dnav .t{font-family:var(--serif);font-size:clamp(1.2rem,2.4vw,1.7rem);letter-spacing:-.02em;transition:color .3s}
+.dnav a:hover .t{color:var(--accent)}
+.dnav .next{align-items:flex-end;text-align:right;margin-left:auto}
+
+.dcta{background:var(--ink);color:var(--bg);padding-block:clamp(70px,12vh,140px);transition:background .5s,color .5s}
+.dcta h2{font-family:var(--serif);font-weight:300;letter-spacing:-.03em;line-height:1;font-size:clamp(2rem,6vw,4.4rem);max-width:16ch;margin-bottom:30px}
+.dcta a{display:inline-flex;align-items:center;gap:12px;font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,2.6vw,1.9rem);border-bottom:1px solid color-mix(in srgb,var(--bg) 40%,transparent);padding-bottom:7px;transition:gap .4s,border-color .4s}
+.dcta a:hover{gap:24px;border-color:var(--bg)}
+
+@media (max-width:760px){ .drow{grid-template-columns:1fr;gap:14px} .drow .lbl{position:static} }
+@media (max-width:680px){ .dhero{padding-top:104px} .dnav a{max-width:48%} }
+</style>
+</head>
+<body data-theme="sand" data-texture="none" data-type="inter">
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="brand" href="index.html" data-cursor>
+      <span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1" stroke="currentColor" stroke-width="1.4"/></svg></span>
+      <span data-brand>Studio</span><span class="tbd">name tbd</span>
+    </a>
+    <a class="back" href="index.html#work" data-cursor><span class="ar">←</span> All capabilities</a>
+  </div>
+  <a class="lang" id="langToggle" href="index.ar.html" data-cursor>ع</a>
+</nav>
+
+<main id="detail"></main>
+
+<script src="capabilities.js"></script>
+<script>
+(function(){
+  const caps = window.CAPABILITIES||[];
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  let idx = caps.findIndex(c=>c.id===id);
+  if(idx<0) idx=0;
+  const c = caps[idx];
+  const prev = caps[(idx-1+caps.length)%caps.length];
+  const next = caps[(idx+1)%caps.length];
+  document.title = (c?c.title:'Capability') + ' — ' + (window.BRAND||'Studio');
+  const lt = document.getElementById('langToggle'); if(lt) lt.href = c ? `capability.ar.html?id=${encodeURIComponent(c.id)}` : 'index.ar.html';
+
+  const esc = s => (s==null?'':String(s));
+  const li = (arr,cls,fn)=>arr.map(fn).join('');
+
+  document.getElementById('detail').innerHTML = c ? `
+    <header class="dhero wrap">
+      <div class="kicker"><span class="no">${esc(c.no)}</span><span class="tag">${esc(c.tag)}</span></div>
+      <h1 class="reveal">${esc(c.title)}</h1>
+      <p class="lead reveal" data-d="1">${esc(c.lead)}</p>
+    </header>
+
+    <section class="drow wrap">
+      <div class="lbl"><span class="label">Grounded in</span></div>
+      <div>
+        <p class="basis-txt reveal">${esc(c.basis)}</p>
+        <div class="cite reveal" data-d="1">${li(c.cites||[],'',x=>`<span class="c"><b>${esc(x[0])}</b> · ${esc(x[1])}</span>`)}</div>
+      </div>
+    </section>
+
+    <section class="drow wrap">
+      <div class="lbl"><span class="label">Our approach</span><h2>How we do it</h2></div>
+      <ul class="alist reveal">
+        ${li(c.approach||[],'',(t,i)=>`<li><span class="an">${String(i+1).padStart(2,'0')}</span><span class="at">${esc(t)}</span></li>`)}
+      </ul>
+    </section>
+
+    <section class="drow wrap">
+      <div class="lbl"><span class="label">What you get</span><h2>Deliverables</h2></div>
+      <ul class="dlist reveal">
+        ${li(c.deliverables||[],'',t=>`<li>${esc(t)}</li>`)}
+      </ul>
+    </section>
+
+    <section class="drow wrap">
+      <div class="lbl"><span class="label">References</span><h2>The literature</h2></div>
+      <ul class="reflist reveal">
+        ${li(c.references||[],'',(t,i)=>`<li><span class="rn">${String(i+1).padStart(2,'0')}</span><span>${esc(t)}</span></li>`)}
+      </ul>
+    </section>
+
+    <nav class="dnav wrap">
+      <a class="prev" href="capability.html?id=${encodeURIComponent(prev.id)}" data-cursor><span class="dir">← Previous</span><span class="t">${esc(prev.title)}</span></a>
+      <a class="next" href="capability.html?id=${encodeURIComponent(next.id)}" data-cursor><span class="dir">Next →</span><span class="t">${esc(next.title)}</span></a>
+    </nav>
+
+    <section class="dcta">
+      <div class="wrap">
+        <h2>Bring us a need. We'll design the whole experience.</h2>
+        <a href="mailto:hello@studio.example" data-cursor>hello@studio.example&nbsp; →</a>
+      </div>
+    </section>
+  ` : `<div class="dhero wrap"><h1>Capability not found.</h1><p class="lead"><a href="index.html#work" style="border-bottom:1px solid var(--accent)">Back to what we make →</a></p></div>`;
+})();
+</script>
+<script src="studio.js"></script>
+</body>
+</html>
