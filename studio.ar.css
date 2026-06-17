@@ -56,8 +56,8 @@ body[data-type="almarai"]{ --sans:'Almarai', system-ui, sans-serif; }
 [dir="rtl"] .anav .next{ margin-left:0; margin-right:auto; align-items:flex-end; text-align:left; }
 [dir="rtl"] .anav .prev{ align-items:flex-start; text-align:right; }
 
-/* hero backdrop flips so the bright wall sits under the right-aligned text */
-[dir="rtl"] .hero-media img{ transform:scaleX(-1); object-position:left center; }
+/* hero backdrop: keep the arch on the left (natural), empty space under the right-aligned text */
+[dir="rtl"] .hero-media img{ transform:none; object-position:center; }
 
 /* marquee scrolls the natural RTL way (toward the right) */
 [dir="rtl"] .marquee .track{ animation-direction:reverse; }
