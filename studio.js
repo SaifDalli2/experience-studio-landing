@@ -110,7 +110,9 @@
     const hero = document.querySelector('.hero'); if(hero) requestAnimationFrame(()=>hero.classList.add('ready'));
 
     if(!reduce){
-      const io=new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:0.16,rootMargin:'0px 0px -8% 0px'});
+      /* threshold:0 (not a fraction of the element) so tall blocks taller than the
+         viewport — e.g. an article body on mobile — still reveal */
+      const io=new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:0,rootMargin:'0px 0px -10% 0px'});
       document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     } else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
 
