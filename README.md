@@ -69,6 +69,44 @@ list are rendered from data after load. Brand Studio changes are read from the
 `<body>`, so the two files stay decoupled; the stored selection being restored on
 load is deliberately not reported as a change.
 
+### Reader feedback — 👍 / 👎
+
+When a reader reaches the end of an article, `article_completed` fires and the SDK
+opens a one-question survey: *Was this worth your time?* — thumbs up or down.
+The SDK caps its own impressions and remembers a submitted survey, so it does not
+nag on every article.
+
+Survey ids live in the `SURVEY` map at the top of `insight.js`:
+
+| Language | Survey | id |
+|---|---|---|
+| English | Before you go | `2164dc2a-b896-40ba-9144-c1b3b6bea092` |
+| Arabic | قبل أن تذهب | `b737d58e-7878-40bf-aa06-61c01e6be36a` |
+
+**Two surveys, not one bilingual survey.** The web SDK reads a survey's
+`defaultLanguage` but never applies its `translations` map — the string
+`translations` does not appear anywhere in the SDK bundle. A bilingual survey would
+therefore show English to Arabic readers. One survey per language is the only way
+to get Arabic in the embedded widget today.
+
+**Two renderer quirks worth remembering when editing these surveys:**
+
+- The binary renderer reads `choices` / `yesLabel` / `noLabel`, *not* the `options`
+  array the survey schema documents. Set `options` alone and you get "Yes" / "No"
+  instead of the thumbs.
+- Choice values must be `"true"` / `"false"`. The server coerces a `binary` answer
+  to a boolean when it flattens it to the top level, so a value like `"up"` is
+  stored as `worth_reading: false` — silently inverting a thumbs-up.
+
+Placement is `bottom-left` for both languages. The Brand Studio panel sits
+bottom-right in LTR and bottom-left in RTL, and the SDK positions its widget with a
+direction-aware property that mirrors under RTL — the two flips cancel, so one
+value keeps the widget opposite the panel in both languages.
+
+Each response carries the article id automatically: the SDK captures the `?id=`
+query parameter into `_variables.id`, so thumbs can be broken down per article
+without any extra wiring.
+
 ## License
 
 © 2026 — All rights reserved.

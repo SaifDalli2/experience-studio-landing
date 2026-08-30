@@ -22,6 +22,18 @@
     gateway:       'https://voice-gateway-service.onrender.com'
   };
 
+  /* ===== READER FEEDBACK SURVEY =====
+     A thumbs up / down asked once the reader finishes an article.
+
+     Two surveys, not one bilingual survey: the web SDK reads a survey's
+     defaultLanguage but never applies its translations map, so an AR
+     reader would be shown English. One survey per language is the only
+     way to get Arabic in the embedded widget today. */
+  const SURVEY = {
+    en: '2164dc2a-b896-40ba-9144-c1b3b6bea092',
+    ar: 'b737d58e-7878-40bf-aa06-61c01e6be36a'
+  };
+
   /* ===== COMMAND STUB =====
      The SDK loads async. Calls made before it arrives are buffered on
      .q and replayed by the loader, so track() is safe from line one. */
@@ -58,6 +70,28 @@
     : document.addEventListener('DOMContentLoaded', fn);
 
   const text = el => (el && el.textContent || '').trim().replace(/\s+/g,' ').slice(0,120);
+
+  /* Ask the reader for a thumb. The SDK caps its own impressions and
+     remembers a submitted survey, so this does not nag on every article.
+
+     Dock it in the corner the Brand Studio panel is NOT using. That panel
+     is bottom-right in LTR and bottom-left in RTL — and the SDK positions
+     its widget with a direction-aware property, so "bottom-left" also
+     mirrors to the right under RTL. The two flips cancel: one value puts
+     the widget opposite the panel in both languages. */
+  const SURVEY_POSITION = 'bottom-left';
+
+  function askForFeedback(){
+    const surveyId = SURVEY[lang];
+    if(!surveyId) return;
+    try {
+      window.CXPinsight('loadSurvey', {
+        surveyId: surveyId,
+        displayMode: 'popup',
+        position: SURVEY_POSITION
+      });
+    } catch(e){}
+  }
 
   ready(function(){
 
@@ -155,6 +189,7 @@
             article_id: recordId,
             seconds: Math.round((Date.now() - started) / 1000)
           });
+          askForFeedback();
         });
       }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
       /* watch a marker at the very end of the prose, not the block itself —
