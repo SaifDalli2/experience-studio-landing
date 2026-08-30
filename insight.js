@@ -85,7 +85,23 @@
            with the page even if the markup ever changes */
         lang: lang,
         displayMode: 'popup',
-        position: SURVEY_POSITION
+        position: SURVEY_POSITION,
+        /* The SDK's display gate defaults are wrong for a per-article ask:
+           maxImpressionsPerSession is 1, so a reader who finishes a second
+           article in the same visit is silently blocked, and onSubmit is
+           "never_show", so one rating retires the survey for that reader
+           on every future article. Both make sense for a site-wide survey;
+           here the survey is asked per article, so the caps come off and
+           each article gets its own ask. */
+        _eventDisplayPreferences: {
+          frequencyCap: {
+            maxImpressionsPerSession: 0,
+            maxImpressionsTotal: 0,
+            minDaysBetweenImpressions: 0
+          },
+          onSubmit: { action: 'show_after_period', cooldownDays: 0 },
+          onSkip:   { action: 'show_again', maxReShows: 0, cooldownDays: 0 }
+        }
       });
     } catch(e){}
     watchSurvey();
