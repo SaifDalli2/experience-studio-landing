@@ -149,14 +149,25 @@ Because custom CSS is applied with `@scope`, a browser without `@scope` support
 gets none of layer 2 and falls back to layer 1 — which is why the base palette is
 worth keeping accurate.
 
-Three things the CSS layer has to do that the theme API cannot:
+Five things the CSS layer has to do that the theme API cannot:
 
+- **Give the card its own surface.** Mapping `--cxp-card-bg` to `--bg` painted it the
+  exact page colour, so over a light section it dissolved into the background and
+  read as "hidden behind the page" — separated only by a 16% hairline and the SDK's
+  soft `0 4px 20px` shadow. The card now sits on `--bg-2` (the site's raised surface)
+  with the Brand Studio panel's heavier shadow; the choices inside stay on `--bg`, so
+  the layers step apart in both light and dark themes.
 - **Hide the description.** The renderer emits
   `a.description || "Help us improve your experience"`, so an empty description
   yields that hardcoded English line — on the Arabic page too. `display: none` on
   `.cxp-widget-description` is the only way to remove it.
-- **Size the thumbs**, which are otherwise rendered at body-text size.
-- **Hide the radio dot** inside each thumb label, since the glyph is the control.
+- **Hide the mic.** `behaviour.voiceMode: false` does *not* remove the voice control
+  from the widget; `.cxp-voice-mic` must be hidden in CSS.
+- **Translate the submit button.** "Submit" is hardcoded in the renderer's markup —
+  there is no `submitText`/`submitLabel` option and the translations map does not
+  reach it — so the Arabic label is swapped via `::after` under `[dir="rtl"]`.
+- **Size the thumbs** (otherwise body-text size) and **hide the radio dot** inside
+  each thumb label, since the glyph is the control.
 
 Theming the survey **detaches** it from the application theme —
 `set_application_theme` returned 403 for the current API key. `reset_survey_theme`
