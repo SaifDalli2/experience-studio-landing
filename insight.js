@@ -24,15 +24,10 @@
 
   /* ===== READER FEEDBACK SURVEY =====
      A thumbs up / down asked once the reader finishes an article.
-
-     Two surveys, not one bilingual survey: the web SDK reads a survey's
-     defaultLanguage but never applies its translations map, so an AR
-     reader would be shown English. One survey per language is the only
-     way to get Arabic in the embedded widget today. */
-  const SURVEY = {
-    en: '2164dc2a-b896-40ba-9144-c1b3b6bea092',
-    ar: 'b737d58e-7878-40bf-aa06-61c01e6be36a'
-  };
+     One bilingual survey: the SDK resolves the language itself, in the
+     order loadSurvey({lang}) → <html lang> → navigator.language, and
+     overlays the survey's translations map for whichever it picks. */
+  const SURVEY_ID = '2164dc2a-b896-40ba-9144-c1b3b6bea092';
 
   /* ===== COMMAND STUB =====
      The SDK loads async. Calls made before it arrives are buffered on
@@ -82,11 +77,13 @@
   const SURVEY_POSITION = 'bottom-left';
 
   function askForFeedback(){
-    const surveyId = SURVEY[lang];
-    if(!surveyId) return;
     try {
       window.CXPinsight('loadSurvey', {
-        surveyId: surveyId,
+        surveyId: SURVEY_ID,
+        /* pass the language explicitly rather than leaning on <html lang>:
+           it is the SDK's first choice, and it keeps the widget in step
+           with the page even if the markup ever changes */
+        lang: lang,
         displayMode: 'popup',
         position: SURVEY_POSITION
       });

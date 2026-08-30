@@ -76,21 +76,37 @@ opens a one-question survey: *Was this worth your time?* — thumbs up or down.
 The SDK caps its own impressions and remembers a submitted survey, so it does not
 nag on every article.
 
-Survey ids live in the `SURVEY` map at the top of `insight.js`:
+The survey id lives in `SURVEY_ID` at the top of `insight.js`:
 
-| Language | Survey | id |
+| Survey | id | Languages |
 |---|---|---|
-| English | Before you go | `2164dc2a-b896-40ba-9144-c1b3b6bea092` |
-| Arabic | قبل أن تذهب | `b737d58e-7878-40bf-aa06-61c01e6be36a` |
+| Before you go / قبل أن تذهب | `2164dc2a-b896-40ba-9144-c1b3b6bea092` | `en` + `ar` |
 
-**Two surveys, not one bilingual survey.** The web SDK reads a survey's
-`defaultLanguage` but never applies its `translations` map — the string
-`translations` does not appear anywhere in the SDK bundle. A bilingual survey would
-therefore show English to Arabic readers. One survey per language is the only way
-to get Arabic in the embedded widget today.
+**One bilingual survey.** The SDK resolves the language itself and overlays the
+survey's `translations` map, in this order:
 
-**Two renderer quirks worth remembering when editing these surveys:**
+```js
+[ loadSurvey({lang}), document.documentElement.getAttribute('lang'), navigator.language ]
+```
 
+`insight.js` passes `lang` explicitly — it is the SDK's first choice and keeps the
+widget in step with the page regardless of markup. The renderer also stamps
+`dir="rtl"` on the container for right-to-left languages, which the custom CSS uses
+to give the Arabic title its own weight.
+
+> Needs an SDK bundle from 2026-08-30 or later. Before that, `translations` appeared
+> nowhere in the bundle and `_selectedLanguage` was read but never assigned, so a
+> bilingual survey always rendered its `defaultLanguage` — which is why this was
+> briefly built as two surveys, one per language. The Arabic-only survey
+> (`b737d58e-7878-40bf-aa06-61c01e6be36a`) is now **closed**, not deleted: it still
+> holds 2 responses.
+
+**Three renderer quirks worth remembering when editing this survey:**
+
+- Per-question translations must be **objects** (`{"worth_reading": {"text": "…"}}`),
+  not the plain strings the MCP `create_survey` docs specify. The renderer checks
+  `typeof c === 'object'` before applying, so a string is silently ignored and the
+  question stays in the default language.
 - The binary renderer reads `choices` / `yesLabel` / `noLabel`, *not* the `options`
   array the survey schema documents. Set `options` alone and you get "Yes" / "No"
   instead of the thumbs.
@@ -98,14 +114,21 @@ to get Arabic in the embedded widget today.
   to a boolean when it flattens it to the top level, so a value like `"up"` is
   stored as `worth_reading: false` — silently inverting a thumbs-up.
 
-Placement is `bottom-left` for both languages. The Brand Studio panel sits
+Placement is `bottom-left`. The Brand Studio panel sits
 bottom-right in LTR and bottom-left in RTL, and the SDK positions its widget with a
 direction-aware property that mirrors under RTL — the two flips cancel, so one
 value keeps the widget opposite the panel in both languages.
 
-Each response carries the article id automatically: the SDK captures the `?id=`
-query parameter into `_variables.id`, so thumbs can be broken down per article
-without any extra wiring.
+Each response carries the article id: the widget sweeps every URL query parameter
+into the response metadata, so `?id=…` arrives as `_variables.id` and thumbs break
+down per article. It is also declared as a survey variable
+(`{name: "id", source: "query", echoInResponse: true}`) so it is a first-class field
+rather than incidental metadata — the capture happens either way, the declaration
+governs how it is surfaced.
+
+Editing `variables` — not just questions — requires pausing the survey first: the
+API returns `409 Question set is locked while the survey is active`, despite the
+message mentioning only questions.
 
 #### Brand theming
 
@@ -135,9 +158,9 @@ Three things the CSS layer has to do that the theme API cannot:
 - **Size the thumbs**, which are otherwise rendered at body-text size.
 - **Hide the radio dot** inside each thumb label, since the glyph is the control.
 
-Theming both surveys individually **detaches** them from the application theme —
+Theming the survey **detaches** it from the application theme —
 `set_application_theme` returned 403 for the current API key. `reset_survey_theme`
-re-links them if that permission is ever granted.
+re-links it if that permission is ever granted.
 
 ## License
 
