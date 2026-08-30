@@ -107,6 +107,38 @@ Each response carries the article id automatically: the SDK captures the `?id=`
 query parameter into `_variables.id`, so thumbs can be broken down per article
 without any extra wiring.
 
+#### Brand theming
+
+The widget is themed in CXPinsight, not in this repo — there is nothing to change
+here to restyle it. Two layers:
+
+1. **A static base** per survey (`set_survey_theme`): Sand & Clay palette, pill
+   buttons, 16px card, the site's type scale, no progress bar, no voice toggle.
+   This is what renders if the CSS layer below cannot apply.
+2. **A live-token layer** (`branding.customCss`) that maps the SDK's `--cxp-*`
+   variables onto this site's own tokens — `--bg`, `--ink`, `--accent`, `--line`,
+   `--sans`, `--serif`. The widget is a child of `<body>`, so it inherits them and
+   **follows the Brand Studio theme as the visitor switches it** — all six
+   palettes, light and dark — instead of being pinned to one. Verified against
+   `sand`, `ember`, `night` and `oxblood`.
+
+Because custom CSS is applied with `@scope`, a browser without `@scope` support
+gets none of layer 2 and falls back to layer 1 — which is why the base palette is
+worth keeping accurate.
+
+Three things the CSS layer has to do that the theme API cannot:
+
+- **Hide the description.** The renderer emits
+  `a.description || "Help us improve your experience"`, so an empty description
+  yields that hardcoded English line — on the Arabic page too. `display: none` on
+  `.cxp-widget-description` is the only way to remove it.
+- **Size the thumbs**, which are otherwise rendered at body-text size.
+- **Hide the radio dot** inside each thumb label, since the glyph is the control.
+
+Theming both surveys individually **detaches** them from the application theme —
+`set_application_theme` returned 403 for the current API key. `reset_survey_theme`
+re-links them if that permission is ever granted.
+
 ## License
 
 © 2026 — All rights reserved.
