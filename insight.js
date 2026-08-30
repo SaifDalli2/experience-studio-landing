@@ -88,6 +88,43 @@
         position: SURVEY_POSITION
       });
     } catch(e){}
+    watchSurvey();
+  }
+
+  /* ===== DID THE SURVEY ACTUALLY APPEAR? =====
+     The SDK reports nothing to the engagement service when a widget is
+     shown or suppressed — the only server-side trace of a survey is a
+     submitted response — so "it didn't show up" is undiagnosable from
+     the data. These three events close that gap: every request is
+     recorded, and each one resolves to either shown or missing.
+
+     survey_missing is the useful one: it means the trigger fired and the
+     SDK was asked, but no widget reached the DOM — a suppression rule, a
+     failed definition fetch, or a survey that is not active. */
+  function watchSurvey(){
+    const started = Date.now();
+    const SELECTOR = '.cxp-widget-container';
+    track('survey_requested', { survey_id: SURVEY_ID });
+
+    let settled = false;
+    const report = ok => {
+      if(settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if(obs) obs.disconnect();
+      track(ok ? 'survey_shown' : 'survey_missing', {
+        survey_id: SURVEY_ID,
+        ms: Date.now() - started
+      });
+    };
+    const obs = 'MutationObserver' in window
+      ? new MutationObserver(() => { if(document.querySelector(SELECTOR)) report(true); })
+      : null;
+    if(obs) obs.observe(document.body, { childList:true, subtree:true });
+    /* generous: the SDK has to fetch the definition before it can render */
+    const timer = setTimeout(() => report(!!document.querySelector(SELECTOR)), 12000);
+    /* the widget can already be up if a previous call rendered it */
+    if(document.querySelector(SELECTOR)) report(true);
   }
 
   ready(function(){
