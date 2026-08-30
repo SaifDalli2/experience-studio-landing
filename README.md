@@ -62,6 +62,9 @@ split by language; detail pages also carry `record_id`.
 | `contact_click` | A `mailto:` link is clicked | `method`, `address`, `location` |
 | `nav_section` | An in-page section anchor is used | `section`, `source` |
 | `brand_studio_change` | A visitor changes theme / texture / body type | `control`, `value` |
+| `survey_requested` | The feedback survey is asked for | `survey_id` |
+| `survey_shown` | The widget reached the DOM | `survey_id`, `ms` |
+| `survey_missing` | It was asked for but never appeared | `survey_id`, `ms` |
 
 Clicks are captured by one delegated listener, because the bento tiles and journal
 list are rendered from data after load. Brand Studio changes are read from the
@@ -72,9 +75,19 @@ load is deliberately not reported as a change.
 ### Reader feedback — 👍 / 👎
 
 When a reader reaches the end of an article, `article_completed` fires and the SDK
-opens a one-question survey: *Was this worth your time?* — thumbs up or down.
-The SDK caps its own impressions and remembers a submitted survey, so it does not
-nag on every article.
+opens a short survey:
+
+1. **Was this worth your time?** — 👍 / 👎 (required; the whole ask for a positive)
+2. **What got in the way?** — five reasons, shown only on 👎 (`showWhen {worth_reading} = false`)
+3. **Anything you'd want us to write about, or do differently?** — optional free text
+
+A thumb alone tells you *that* something missed, not *what*, so the follow-up is
+where the actionable signal is. Friction sits only on the negative path.
+
+The SDK's own display gate is governed by `onSubmit.action`, which **defaults to
+`never_show`** — once a browser submits, that survey id never appears again for
+them. With one survey covering every article that means a reader can rate exactly
+one article, ever. Change the submit policy if that is not what you want.
 
 The survey id lives in `SURVEY_ID` at the top of `insight.js`:
 
@@ -118,6 +131,13 @@ Placement is `bottom-left`. The Brand Studio panel sits
 bottom-right in LTR and bottom-left in RTL, and the SDK positions its widget with a
 direction-aware property that mirrors under RTL — the two flips cancel, so one
 value keeps the widget opposite the panel in both languages.
+
+**Why the last three events exist.** The SDK reports nothing to the engagement
+service when a survey is shown or suppressed — a scan of 3,000 events turns up no
+survey signal of any kind, and the only server-side trace is a submitted response
+in a different service. So "the survey didn't show up" was undiagnosable. Those
+three events close the gap: `survey_missing` means the trigger fired and the SDK
+was asked, but nothing reached the page.
 
 Each response carries the article id: the widget sweeps every URL query parameter
 into the response metadata, so `?id=…` arrives as `_variables.id` and thumbs break
